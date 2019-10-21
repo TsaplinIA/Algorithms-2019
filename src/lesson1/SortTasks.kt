@@ -2,6 +2,9 @@
 
 package lesson1
 
+import java.io.File
+import kotlin.math.abs
+
 /**
  * Сортировка времён
  *
@@ -63,8 +66,25 @@ fun sortTimes(inputName: String, outputName: String) {
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortAddresses(inputName: String, outputName: String) {
-    TODO()
-}
+    val streets = mutableMapOf<String, MutableMap<Int, MutableList<String>>>()
+    File(outputName).bufferedWriter().use {
+        val br = File(inputName).bufferedReader()
+        var line: String? = br.readLine()
+        while (line != null) {
+            line = line.replace(Regex(""" +"""), " ")
+            if (Regex("""[A-zА-яёЁ]+ [A-zА-яёЁ]+ - [A-zА-яёЁ-]+ \d+""").matches(line)) {
+                val parts = line.split(" ")
+                streets.getOrPut(parts[3], { mutableMapOf() })
+                    .getOrPut(parts[4].toInt(), { mutableListOf() })
+                    .add(parts[0] + " " + parts[1])
+                line = br.readLine()
+            } else throw Exception("incorrect input")
+        }
+        for (street in streets.toSortedMap())
+            for (number in street.value.toSortedMap())
+                it.write(street.key + " " + number.key + " - " + number.value.sorted().joinToString(", ") + "\n")
+    }
+}// O(street.size * number.size) + O(getOrPut) - в лучшем случае O(n) + O(getOrPut), в худшем O(n/2 * n/2) ~ O(n^2)
 
 /**
  * Сортировка температур
@@ -97,8 +117,32 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
-}
+    val temperaturesPlus = MutableList(5001) { 0 }
+    val temperaturesMinus = MutableList(2731) { 0 }
+    File(outputName).bufferedWriter().use {
+        val br = File(inputName).bufferedReader()
+        var line: String? = br.readLine()
+        while (line != null) {
+            if (Regex("""-?\d+.\d""").matches(line)) {
+                val temp = (abs(line.toFloat()) * 10).toInt()
+                if (line[0] != '-')
+                    temperaturesPlus[temp]++
+                else
+                    temperaturesMinus[temp]++
+            } else throw Exception("incorrect input")
+            line = br.readLine()
+        }
+        val writer = it
+        for (i in temperaturesMinus.lastIndex downTo 1)
+            repeat(temperaturesMinus[i]) {
+                writer.write("-${i / 10}.${i % 10}\n")
+            }
+        for (i in 0..temperaturesPlus.lastIndex)
+            repeat(temperaturesPlus[i]) {
+                writer.write("${i / 10}.${i % 10}\n")
+            }
+    }
+}//Трудоёмкость - O(n), Ресурсоёмкость - O(1)???если не брать в расчёт вес файла вывода???
 
 /**
  * Сортировка последовательности
@@ -149,5 +193,13 @@ fun sortSequence(inputName: String, outputName: String) {
  */
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
     TODO()
+}
+
+fun main() {
+    val a = MutableList(5) { 0 }
+
+    repeat(3) {
+        println(1)
+    }
 }
 
