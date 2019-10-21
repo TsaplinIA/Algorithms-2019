@@ -73,6 +73,27 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+        //New Tests
+        try {
+            sortAddresses("input/myaddr_in1.txt", "temp.txt")
+            assertFileContent(
+                "temp.txt",
+                """
+                    Адмиралтейский 61 - Бирюков Оливер, Гафонов Джеймс
+                    Амит 27 - Велезнев Маргарита
+                    Атаманская 95 - Вернов Виктор
+                    Банковский 58 - Вешняков Екатерина
+                    Казанская 7 - Гарасев Хлоя
+                    Ломоносова 70 - Чижов Оливер
+                    Рязанский 55 - Толкачев Екатерина
+                    Сапёрный 28 - Буков Илья
+                    Транспортный 19 - Ковалев Ария
+                    Фонтанки 61 - Бондарев Анна, Владимиров Джек
+                """.trimIndent()
+            )
+        } finally {
+            File("temp.txt").delete()
+        }
     }
 
     private fun generateTemperatures(size: Int): PerfResult<Unit> {
@@ -137,6 +158,30 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         }
 
         println("sortTemperatures: $perf")
+
+        //new Tests
+        try {
+            sortTemperatures("input/mytemp_in1.txt", "temp.txt")
+            assertFileContent(
+                "temp.txt",
+                """
+                    -255.9
+                    -71.0
+                    -71.0
+                    -44.7
+                    16.8
+                    44.7
+                    68.1
+                    68.1
+                    89.3
+                    112.0
+                    342.6
+                """.trimIndent()
+            )
+        } finally {
+            File("temp.txt").delete()
+        }
+
     }
 
     private fun generateSequence(totalSize: Int, answerSize: Int): PerfResult<Unit> {
