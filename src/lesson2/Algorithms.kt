@@ -2,6 +2,8 @@
 
 package lesson2
 
+import java.io.File
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -95,8 +97,31 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * вернуть ту из них, которая встречается раньше в строке first.
  */
 fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
-}
+    val substrings = mutableListOf("")// Ресурсоёмкость: O(t)
+    val fl = first.lastIndex
+    val sl = second.lastIndex
+    for (i in 0..fl) {//f раз
+        for (j in 0..sl) {//s раз
+            var tempStr = ""
+            var count = 0
+            while ((i + count) <= fl && (j + count) <= sl && first[i + count] == second[j + count]) {//Трудоёмкость O(<k>)
+                tempStr += first[i + count]
+                count++
+            }
+            if (tempStr.length > substrings[0].length)
+                substrings[0] = tempStr
+        }
+    }
+    return substrings[substrings.lastIndex]
+}//Трудоёмкость - O(n*m), Ресурсоёмкость - O(1), n & m - длинны первого и второго слова сответственно
+/*ИТОГО:
+    s - длина второго слова
+    f - длина первого слова
+    t - количество "возрастающих" по длинне подстрок подстрок
+    k - длина подстроки
+    Трудоёмкость: O(s * f * <k>)
+    Ресурсоёмкость: O(t)
+*/
 
 /**
  * Число простых чисел в интервале
@@ -139,5 +164,79 @@ fun calcPrimesNumber(limit: Int): Int {
  * Остальные символы ни в файле, ни в словах не допускаются.
  */
 fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
-    TODO()
+    val result = mutableSetOf<String>()//Ресурсоёмкость: O(l)
+    val br = File(inputName).bufferedReader()
+    var tempStr: String? = br.readLine()
+    val matrix = mutableListOf<MutableList<Char>>()//Ресурсоёмкость: O(k * q)
+    var i = 0
+    while (tempStr != null) {//k раз
+        val row = mutableListOf<Char>()//Ресурсоёмкость: O(q)
+        for (j in 0..tempStr!!.lastIndex) //j раз Трудоёмкость: O(j)
+            if (j % 2 == 0) row.add(tempStr[j])
+        matrix.add(row)
+        tempStr = br.readLine()
+        i++
+    }//Трудоёмкость: O(k * j);Ресурсоёмкость: O(q)
+    for (word in words) {//  p раз
+        var tmp = 1
+        var tempList = mutableListOf<Pair<Pair<Int, Int>, MutableList<Pair<Int, Int>>>>()//Ресурсоёмкость: O(<m>)
+        for (i in 0..matrix.lastIndex)//k раз,Трудоёмкость: O(k * q)
+            for (j in 0..matrix[i].lastIndex)//q раз
+                if (word[0] == matrix[i][j]) tempList.add((i to j) to mutableListOf(i to j))
+        var wordFind = false
+        while (tmp <= word.lastIndex && !wordFind) {//<s> раз
+            val tempList2 = mutableListOf<Pair<Pair<Int, Int>, MutableList<Pair<Int, Int>>>>()//Ресурсоёмкость: O(<m>)
+            tempList.forEach {//<d> раз
+                val pairNow = it.first
+                val usePair = it.second
+                mutableListOf(//тут мы используем память, но не храним, так что в ресурсоёмкость не включаю
+                    pairNow.first + 1 to pairNow.second,
+                    pairNow.first - 1 to pairNow.second,
+                    pairNow.first to pairNow.second + 1,
+                    pairNow.first to pairNow.second - 1
+                ).filter { el ->
+                    el.first <= matrix.lastIndex &&
+                            el.first >= 0 &&
+                            el.second <= matrix.first().lastIndex &&
+                            el.second >= 0 &&
+                            matrix[el.first][el.second] == word[tmp] &&
+                            el !in usePair
+                }.map { neigh ->
+                    val usePairNeigh = usePair.toMutableList()
+                    usePairNeigh.add(neigh)
+                    if (word.lastIndex <= usePairNeigh.lastIndex) wordFind = true
+                    tempList2.add(neigh to usePairNeigh)
+                }
+                if (wordFind) println("$word - $usePair")
+            }// // Трудоёмкость: O(<d>)
+            tempList = tempList2.toMutableList()
+            tmp++
+        }// Трудоёмкость: O(<d> * <s>)
+        if (wordFind) result.add(word)
+    }// Трудоёмкость: O(p * <d> * <s>)
+    return result
+}/*
+ИТОГО:
+    l - кол-во найденных слов
+    k - кол-во строк; Трудоёмкость: O(i * q)
+    j - количество символов в строке
+    p - кол-во искомых слов
+    s - количество симолов в искомом словае
+    q - количество символов в строке, исключая пробелы
+    d - количество символа (из s) в матрице
+    m - количество "путей"(как тупиковых, так и истинных) составления искомого слова по матрице умноженое на среднюю дниту "пути"
+    рост q ~ росту j ->
+    Трудоёмкость: O(p * k * q + p * <d> * <s>) + O(k * j) =
+    = O(p * k * q + p * <d> * <s>) + O(k * q) =
+    = O((p + 1) * k * q + p * <d> * <s>) =* рост p + 1 ~ росту p
+    =* O(p * (k * q +  <d> * <s>))
+    //Ресурсоёмкость: O(l) + O(k * q) + 2O(<m>) =(l <= m, a чаще всего l << m) = O(k * q + <m>)
+*/
+
+fun main() {
+    val a = baldaSearcher(
+        "input/balda_in1.txt",
+        setOf("ТРАВКА", "ТРАВА", "КРАН", "АКВА", "НАРТЫ", "РАК")
+    ) // "ТРАВА", "КРАН", "АКВА", "НАРТЫ", "РАК"
+    println(a)
 }

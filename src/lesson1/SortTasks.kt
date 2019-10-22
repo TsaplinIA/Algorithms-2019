@@ -3,7 +3,7 @@
 package lesson1
 
 import java.io.File
-import kotlin.math.abs
+import java.util.*
 
 /**
  * Сортировка времён
@@ -66,25 +66,34 @@ fun sortTimes(inputName: String, outputName: String) {
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortAddresses(inputName: String, outputName: String) {
-    val streets = mutableMapOf<String, MutableMap<Int, MutableList<String>>>()
+    val streets = sortedMapOf<String, SortedMap<Int, MutableList<String>>>()//Ресурсозатраты: O(s * m * k)
     File(outputName).bufferedWriter().use {
         val br = File(inputName).bufferedReader()
         var line: String? = br.readLine()
-        while (line != null) {
+        while (line != null) {//n раз
             line = line.replace(Regex(""" +"""), " ")
             if (Regex("""[A-zА-яёЁ]+ [A-zА-яёЁ]+ - [A-zА-яёЁ-]+ \d+""").matches(line)) {
                 val parts = line.split(" ")
-                streets.getOrPut(parts[3], { mutableMapOf() })
-                    .getOrPut(parts[4].toInt(), { mutableListOf() })
-                    .add(parts[0] + " " + parts[1])
+                streets.getOrPut(parts[3], { sortedMapOf() })//Трудозатраты O(log(s))
+                    .getOrPut(parts[4].toInt(), { mutableListOf() })//Трудозатраты O(log(m))
+                    .add(parts[0] + " " + parts[1])//Трудозатраты O(1)
                 line = br.readLine()
             } else throw Exception("incorrect input")
-        }
-        for (street in streets.toSortedMap())
-            for (number in street.value.toSortedMap())
-                it.write(street.key + " " + number.key + " - " + number.value.sorted().joinToString(", ") + "\n")
+        }//Трудозатраты O(n * log(s * m))
+        for (street in streets)//s раз
+            for (number in street.value)//m раз
+                it.write(street.key + " " + number.key + " - " + number.value.sorted().joinToString(", ") + "\n")// k * log(k)
     }
-}// O(street.size * number.size) + O(getOrPut) - в лучшем случае O(n) + O(getOrPut), в худшем O(n/2 * n/2) ~ O(n^2)
+}
+/*
+ИТОГО:
+    n - кол-во строк в файле входа
+    s - количество улиц
+    m - среднее кол-во домов на улице
+    k - среднее кол-во жильцов в доме
+    Ресурсозатраты: O(s * m * k)???если не брать в расчёт вес файла вывода???
+    Трудозатраты: O(n * log(s * m)) + O(s * m * k * log(k)) ~ O(n * log(n))
+ */
 
 /**
  * Сортировка температур
@@ -116,33 +125,36 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 99.5
  * 121.3
  */
+const val MAX_DELTA_TEMPERATURE = 7730
+const val MAX_ABS_MINUS_TEMPERATURE = 2730
 fun sortTemperatures(inputName: String, outputName: String) {
-    val temperaturesPlus = MutableList(5001) { 0 }
-    val temperaturesMinus = MutableList(2731) { 0 }
+    val temperature = MutableList(MAX_DELTA_TEMPERATURE + 1) { 0 }//не зависит от n
     File(outputName).bufferedWriter().use {
         val br = File(inputName).bufferedReader()
-        var line: String? = br.readLine()
-        while (line != null) {
+        var line: String? = br.readLine()//не зависит от n
+        while (line != null) {//n раз
             if (Regex("""-?\d+.\d""").matches(line)) {
-                val temp = (abs(line.toFloat()) * 10).toInt()
-                if (line[0] != '-')
-                    temperaturesPlus[temp]++
-                else
-                    temperaturesMinus[temp]++
+                val temp = (line.toFloat() * 10).toInt() + MAX_ABS_MINUS_TEMPERATURE
+                temperature[temp]++
             } else throw Exception("incorrect input")
             line = br.readLine()
         }
         val writer = it
-        for (i in temperaturesMinus.lastIndex downTo 1)
-            repeat(temperaturesMinus[i]) {
-                writer.write("-${i / 10}.${i % 10}\n")
+        for (i in 0..MAX_DELTA_TEMPERATURE) {//const раз
+            val isMinusTemp = if (i < MAX_ABS_MINUS_TEMPERATURE) 1 else 0
+            val tempNow = (i - MAX_ABS_MINUS_TEMPERATURE) * (1 - 2 * isMinusTemp)
+            repeat(temperature[i]) {
+                writer.write("-".repeat(isMinusTemp) + "${tempNow / 10}.${tempNow % 10}\n")
             }
-        for (i in 0..temperaturesPlus.lastIndex)
-            repeat(temperaturesPlus[i]) {
-                writer.write("${i / 10}.${i % 10}\n")
-            }
+        }
     }
-}//Трудоёмкость - O(n), Ресурсоёмкость - O(1)???если не брать в расчёт вес файла вывода???
+}
+/*
+ИТОГО:
+    n - количество строк во входном файле
+    Трудоёмкость - O(n)
+    Ресурсоёмкость - O(1)???если не брать в расчёт вес файла вывода???
+ */
 
 /**
  * Сортировка последовательности
@@ -196,10 +208,9 @@ fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
 }
 
 fun main() {
-    val a = MutableList(5) { 0 }
-
-    repeat(3) {
-        println(1)
-    }
+    val a = sortedMapOf("1" to 1, "2" to 2, "11" to 3)
+    a["10"] = 4
+    //val a = mutableMapOf("1" to 1, "2" to 2, "11" to 3)
+    print(a)
 }
 
