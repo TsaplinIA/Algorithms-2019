@@ -11,6 +11,11 @@ class KotlinHeadSetTest : AbstractHeadTailTest() {
         fillTree { KtBinaryTree() }
     }
 
+    @BeforeEach
+    fun fillNewTree() {
+        fillNewTree { KtBinaryTree() }
+    }
+
     @Test
     @Tag("Normal")
     fun headSetTest() {

@@ -5,6 +5,7 @@ import kotlin.test.*
 
 abstract class AbstractHeadTailTest {
     private lateinit var tree: SortedSet<Int>
+    private lateinit var newTree: SortedSet<Char>
     private lateinit var randomTree: SortedSet<Int>
     private val randomTreeSize = 1000
     private val randomValues = mutableListOf<Int>()
@@ -32,6 +33,21 @@ abstract class AbstractHeadTailTest {
             }
         }
     }
+    //myTest
+    protected fun fillNewTree(create: () -> SortedSet<Char>) {
+        this.newTree = create()
+
+        newTree.add('B')
+        newTree.add('I')
+        newTree.add('N')
+        newTree.add('A')
+        newTree.add('R')
+        newTree.add('Y')
+        newTree.add('T')
+        newTree.add('R')
+        newTree.add('E')
+        newTree.add('E')
+    }
 
 
     protected fun doHeadSetTest() {
@@ -52,6 +68,17 @@ abstract class AbstractHeadTailTest {
         for (i in 1..10)
             assertEquals(true, set.contains(i))
 
+
+        //myTest
+        var newSet = newTree.headSet('R')
+        assertEquals(true, newSet.contains('B'))
+        assertEquals(true, newSet.contains('I'))
+        assertEquals(true, newSet.contains('N'))
+        assertEquals(true, newSet.contains('A'))
+        assertEquals(false, newSet.contains('R'))
+        assertEquals(false, newSet.contains('Y'))
+        assertEquals(false, newSet.contains('T'))
+        assertEquals(true, newSet.contains('E'))
     }
 
     protected fun doTailSetTest() {
@@ -70,7 +97,17 @@ abstract class AbstractHeadTailTest {
         set = tree.tailSet(-128)
         for (i in 1..10)
             assertEquals(true, set.contains(i))
+        //myTest
+        val newSet = newTree.tailSet('T')
 
+        assertEquals(false, newSet.contains('B'))
+        assertEquals(false, newSet.contains('I'))
+        assertEquals(false, newSet.contains('N'))
+        assertEquals(false, newSet.contains('A'))
+        assertEquals(false, newSet.contains('R'))
+        assertEquals(true, newSet.contains('Y'))
+        assertEquals(true, newSet.contains('T'))
+        assertEquals(false, newSet.contains('E'))
     }
 
     protected fun doHeadSetRelationTest() {
