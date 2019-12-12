@@ -35,6 +35,13 @@ abstract class AbstractDynamicTests {
                 """.trimIndent()
             ).length, "Answer must have length of $expectedLength2"
         )
+
+        //myTests
+        assertEquals("", longestCommonSubSequence("kotlin", "java"))
+        assertEquals("on", longestCommonSubSequence("python", "kotlin"))
+        assertEquals("c", longestCommonSubSequence("c++", "c#"))
+        assertEquals("sl", longestCommonSubSequence("scala", "mysql"))
+        assertEquals("r man", longestCommonSubSequence("super man", "iron man"))
     }
 
     fun longestIncreasingSubSequence(longestIncreasingSubSequence: (List<Int>) -> List<Int>) {
@@ -55,6 +62,13 @@ abstract class AbstractDynamicTests {
                 )
             )
         )
+
+        //myTests
+        assertEquals(listOf(2, 5, 12, 14, 90, 101), longestIncreasingSubSequence(listOf(2, 5, 3, 12, 14, 90, 101, 91)))
+        assertEquals(listOf(3, 4, 5, 8), longestIncreasingSubSequence(listOf(3, 4, 2, 15, 13, 5, 8)))
+        assertEquals(listOf(8, 800), longestIncreasingSubSequence(listOf(8, 800, 5, 55, 35, 35)))
+        assertEquals(listOf(8, 33, 80), longestIncreasingSubSequence(listOf(8, 91, 8, 2, 33, 3, 80, 9)))
+        assertEquals(listOf(2, 16, 32, 64, 256), longestIncreasingSubSequence(listOf(2, 16, 32, 4, 8, 64, 256, 128)))
     }
 
     fun shortestPathOnField(shortestPathOnField: (String) -> Int) {
@@ -64,6 +78,10 @@ abstract class AbstractDynamicTests {
         assertEquals(28, shortestPathOnField("input/field_in4.txt"))
         assertEquals(222, shortestPathOnField("input/field_in5.txt"))
         assertEquals(15, shortestPathOnField("input/field_in6.txt"))
+
+        //myTests
+        assertEquals(74, shortestPathOnField("input/field_in7.txt"))
+        assertEquals(8, shortestPathOnField("input/field_in8.txt"))
     }
 
 }
